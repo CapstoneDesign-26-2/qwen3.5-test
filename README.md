@@ -12,6 +12,36 @@
 설계 원천은 팀 Notion '캡스톤 온디바이스 조사'(종합 보고서·결정 로그)이고, 코드에서 문서를 해석한 내용은
 [`docs/DECISIONS-IMPL.md`](docs/DECISIONS-IMPL.md)에 남긴다.
 
+> [!IMPORTANT]
+> **이 README와 코드는 작성 당시(2026-10-22~10-30) 기준이다.** 이후 바뀐 방향은 아래 「현재 위치」에만 적고,
+> 본문과 코드는 당시 기록으로 그대로 둔다.
+
+## 현재 위치 (2026-11-02)
+
+**코드 이력**
+
+- 10-22~10-25: 클라우드 개발 루틴이 순수 Kotlin 모듈·문서를 작성(옛 `claude/dev` 브랜치).
+- 10-30: 팀 PC에서 Windows 빌드 수정, 코레일톡 OCR 실험(`OcrProbe`), llama.cpp 엔진 벤치(`llm/llamacpp`) 추가.
+- `main`에는 10-30까지의 작업이 모두 들어 있다. `claude/dev`·`claude/env-check`·`feat/1030-korail-ocr-llamacpp`는 이미 `main`에 포함된 옛 작업 브랜치다.
+
+**이후 바뀐 방향 (11-02 모델 테스트 기준, 코드에는 아직 반영 안 됨)**
+
+| 항목 | 작성 당시 (본문·코드) | 11-02 기준 |
+| --- | --- | --- |
+| 추론 엔진 | LiteRT-LM (llama.cpp는 10-30 비교 실험) | LiteRT-LM |
+| 모델 | Gemma 3n E2B (`app` `MainActivity.MODEL_FILE`, `NOTICE`) | Gemma 4 E2B |
+| 대상 기기 | 갤럭시 S23~S25 | 갤럭시 S22~S25 |
+| AI 역할 | 발화 → 슬롯 JSON, 화면 조작은 상태머신 | 같은 방향(하이브리드). 확정 버튼 차단·로그인 화면은 코드가 처리 |
+
+- 모델 비교 결과(Qwen3.5-4B vs Gemma 4 E2B, 정확도·속도·LiteRT-LM 지원)는 노션
+  [최종 후보 모델 테스트](https://app.notion.com/p/40c85a1a2545814f922acb86ef0b6388)에 있다.
+
+**문서 속 번호 읽는 법**
+
+- `D번호`: 노션 '캡스톤 온디바이스 조사'의 결정 로그 항목.
+- `I번호`: 결정 로그를 코드로 옮기며 고른 해석([`docs/DECISIONS-IMPL.md`](docs/DECISIONS-IMPL.md)).
+- `W`·`M`·`T`·`G` 번호: 노션 개발 계획(상세 ⑥)의 작업·실측·테스트 항목.
+
 ## 모듈 구조 (D26·D36)
 
 | 모듈 | 종류 | 내용 | 담당 |
@@ -46,14 +76,22 @@
 - 모델 파일(`*.litertlm`)은 저장소에 넣지 않는다. 기기에 `adb push`로 올린다(D40, [`docs/FIRST-DAY.md`](docs/FIRST-DAY.md)).
 - 빌드 후 `aapt dump permissions app-debug.apk`로 INTERNET 권한이 없는지 확인한다.
 
-## 현재 상태 (2026-10-25)
+## 작성 당시 상태 (2026-10-25 기록)
 
 - 순수 Kotlin 모듈은 클라우드 개발 루틴이 매 회차 빌드·테스트한다(33회차 329개)(`./gradlew -Pcapstone.android=false test`, 회차별 결과는 [`docs/ENV.md`](docs/ENV.md)).
 - Android 모듈(`service/android`·`llm/litertlm`·`app`·`mock-app`)은 클라우드에서 Google Maven이 막혀 **한 번도 컴파일되지 않았다**.
   10-26 팀 PC에서 처음 빌드한다([`docs/FIRST-DAY.md`](docs/FIRST-DAY.md) 1절).
 - 코레일+ 화면 서명·시나리오는 아직 없다(10-27 덤프 뒤). 지금 시나리오는 목업 앱(`capstone.mock`)만 대상이다.
 
+### 10-30 추가 (실험)
+
+- `service/android`의 `OcrProbe`: 코레일톡 열차 목록 카드가 접근성에 글자 없는 버튼으로만 보여서, 화면을 찍어 기기 안 OCR(ML Kit 한국어)로 읽을 수 있는지와 걸리는 시간을 재는 실험. adb 브로드캐스트로만 실행한다.
+- `llm/llamacpp`: llama.cpp 엔진 비교 벤치(JNI). PC에 llama.cpp 소스(`../llama.cpp` 또는 `capstone.llamaCppDir`)가 있을 때만 빌드에 포함된다.
+  11-02에 엔진을 LiteRT-LM으로 정해 이 모듈은 비교 실험 기록으로 남긴다.
+
 ## 문서
+
+`docs/` 아래 문서는 10-22~10-25 클라우드 개발 루틴이 회차마다 남긴 작업 기록이라 당시 기준이다.
 
 | 문서 | 내용 |
 | --- | --- |
@@ -65,6 +103,8 @@
 | [`tools/README.md`](tools/README.md) · [`mock-app/README.md`](mock-app/README.md) | 재생기·결함 주입·mask-lint 사용법 / 목업 화면·변형 스위치 |
 
 ## 역할 (D37 안 1)
+
+작성 당시의 역할 안이다. 실제 담당 배정은 팀에서 정한다.
 
 - **A — 실기기·코레일+ 조작**: `service`(core·android), `app-scenarios`. 코레일+·병원 앱 노드 덤프, 창 목록, 오류 6, M1·M2·M5.
 - **B — 안전장치·상태머신·자동 테스트**: `gate`, `agent-core`, `tools`, CI. gate T1~T12·G1~G8, 재생기 M3·M4·M6·M7.
