@@ -22,7 +22,8 @@
 
 - 10-22~10-25: 클라우드 개발 루틴이 순수 Kotlin 모듈·문서를 작성(옛 `claude/dev` 브랜치).
 - 10-30: 팀 PC에서 Windows 빌드 수정, 코레일톡 OCR 실험(`OcrProbe`), llama.cpp 엔진 벤치(`llm/llamacpp`) 추가.
-- `main`에는 10-30까지의 작업이 모두 들어 있다. `claude/dev`·`claude/env-check`·`feat/1030-korail-ocr-llamacpp`는 이미 `main`에 포함된 옛 작업 브랜치다.
+- `main`에는 10-30까지의 작업이 모두 들어 있다. `claude/dev`·`feat/1030-korail-ocr-llamacpp`는 이미 `main`에 포함된 옛 작업 브랜치다.
+- `claude/env-check`는 10-22 클라우드 환경 점검 메모(`docs/ENV_CHECK.md`) 하나만 있는 브랜치로, `main`에는 합치지 않았다.
 
 **이후 바뀐 방향 (11-02 모델 테스트 기준, 코드에는 아직 반영 안 됨)**
 
