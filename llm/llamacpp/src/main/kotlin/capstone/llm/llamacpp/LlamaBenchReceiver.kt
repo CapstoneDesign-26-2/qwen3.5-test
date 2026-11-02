@@ -101,7 +101,8 @@ class LlamaBenchReceiver : BroadcastReceiver() {
                 Log.i(
                     TAG,
                     "$id prompt=$nPrompt first=${firstUs / 1000}ms gen=$nGen " +
-                        "pp=%.1f tg=%.1f tok/s | %s".format(row.getDouble("pp_tps"), row.getDouble("tg_tps"), answer.replace('\n', ' ').take(120)),
+                        // D70: 모델 답변은 logcat에 남기지 않고 jsonl에만 쓴다.
+                        "pp=%.1f tg=%.1f tok/s".format(row.getDouble("pp_tps"), row.getDouble("tg_tps")),
                 )
             }
         }
